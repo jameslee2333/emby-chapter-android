@@ -9,7 +9,9 @@ import com.embychapter.data.repository.EmbyRepository
 import com.embychapter.data.repository.SettingsRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromString
 
 data class VideoItem(
     val id: String,
