@@ -37,7 +37,7 @@ android {
                 "proguard-rules.pro"
             )
             // keystore 存在就用它签名，不存在则 fallback 到 debug 签名（本地开发场景）
-            signingConfig = if (signingConfigs.getByName("release").storeFile.exists()) {
+            signingConfig = if (signingConfigs.getByName("release").storeFile?.exists() == true) {
                 signingConfigs.getByName("release")
             } else {
                 signingConfigs.getByName("debug")
