@@ -124,7 +124,7 @@ class VideoWallViewModel(application: Application) : AndroidViewModel(applicatio
 
     private suspend fun saveCache(items: List<EmbyItem>) {
         try {
-            val jsonString = json.encodeToString(items)
+            val jsonString = json.encodeToString<List<EmbyItem>>(items)
             val now = System.currentTimeMillis()
             // Atomic write: both keys in a single DataStore edit
             settingsRepo.saveVideoCache(jsonString, now)
