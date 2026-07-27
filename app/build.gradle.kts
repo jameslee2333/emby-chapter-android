@@ -36,7 +36,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            // keystore 存在就用它签名，不存在则 fallback 到 debug 签名（本地开发场景）
+            signingConfig = if (signingConfigs.getByName("release").storeFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
         debug {
             signingConfig = signingConfigs.getByName("debug")
