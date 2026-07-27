@@ -2,13 +2,25 @@ package com.embychapter.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Primary palette - warm amber/orange (matches original uni-app accent)
-val Primary = Color(0xFFE19B58)
-val PrimaryVariant = Color(0xFFD98038)
-val PrimaryLight = Color(0xFFF3BF7D)
+// Primary palette - warm amber/orange (Expressive: more vibrant)
+val Primary = Color(0xFFF5A94C)
+val OnPrimary = Color(0xFF1C1A18)
+val PrimaryContainer = Color(0xFFFFD9A8)
+val OnPrimaryContainer = Color(0xFF4A2C00)
+val PrimaryVariant = Color(0xFFFF9A2B)
+val PrimaryLight = Color(0xFFFFC97A)
 
 // Secondary palette - teal
-val Secondary = Color(0xFF4AA0AA)
+val Secondary = Color(0xFF4ECDC4)
+val OnSecondary = Color(0xFF003735)
+val SecondaryContainer = Color(0xFFBCECE8)
+val OnSecondaryContainer = Color(0xFF00504C)
+
+// Tertiary palette - coral (new for Expressive)
+val Tertiary = Color(0xFFFF8A65)
+val OnTertiary = Color(0xFF3E0A00)
+val TertiaryContainer = Color(0xFFFFD1C4)
+val OnTertiaryContainer = Color(0xFF5E1A00)
 
 // Background palette - dark navy
 val BackgroundDark = Color(0xFF0D1820)
@@ -32,7 +44,12 @@ val Danger = Color(0xFFD3685D)
 val Warning = Color(0xFFF0BE84)
 
 // Card gradient colors
-val CardCoral = Color(0xFFD77C43)
+val CardCoral = Color(0xFFE88B5A)
 val CardMint = Color(0xFF52A07C)
-val CardAmber = Color(0xFFD89549)
-val CardSky = Color(0xFF4A78A1)
+val CardAmber = Color(0xFFE8A34D)
+val CardSky = Color(0xFF5A8FBF)
+
+// Expressive accent tonal layers
+val AccentAmberSoft = Color(0xFF332211)
+val AccentTealSoft = Color(0xFF052F2D)
+val AccentCoralSoft = Color(0xFF33150E)

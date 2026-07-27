@@ -1,30 +1,43 @@
 package com.embychapter.ui.theme
 
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
+private val ExpressiveDarkColorScheme = darkColorScheme(
     primary = Primary,
-    onPrimary = TextOnPrimary,
-    primaryContainer = PrimaryVariant,
+    onPrimary = OnPrimary,
+    primaryContainer = PrimaryContainer,
+    onPrimaryContainer = OnPrimaryContainer,
     secondary = Secondary,
+    onSecondary = OnSecondary,
+    secondaryContainer = SecondaryContainer,
+    onSecondaryContainer = OnSecondaryContainer,
+    tertiary = Tertiary,
+    onTertiary = OnTertiary,
+    tertiaryContainer = TertiaryContainer,
+    onTertiaryContainer = OnTertiaryContainer,
     background = BackgroundDark,
-    surface = Surface,
-    surfaceVariant = SurfaceLight,
     onBackground = TextPrimary,
+    surface = Surface,
     onSurface = TextPrimary,
+    surfaceVariant = SurfaceLight,
     onSurfaceVariant = TextSecondary,
+    surfaceTint = Primary,
     error = Danger,
     onError = Color.White,
-    outline = TextMuted.copy(alpha = 0.3f)
+    outline = TextMuted.copy(alpha = 0.4f),
+    outlineVariant = TextMuted.copy(alpha = 0.2f),
+    scrim = Color.Black.copy(alpha = 0.6f)
 )
 
 @Composable
 fun EmbyChapterTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = DarkColorScheme,
-        typography = Typography,
+    MaterialExpressiveTheme(
+        colorScheme = ExpressiveDarkColorScheme,
+        typography = ExpressiveTypography,
+        shapes = AppShapes,
         content = content
     )
 }

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Refresh
@@ -39,50 +38,85 @@ fun VideoWallScreen(viewModel: VideoWallViewModel = viewModel()) {
         // Hero
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = PrimaryVariant.copy(alpha = 0.2f))
+            colors = CardDefaults.cardColors(containerColor = Primary.copy(alpha = 0.18f)),
+            shape = ExpressiveShapes.HeroCard
         ) {
-            Column(Modifier.padding(16.dp)) {
-                Text("Emby Video Wall", style = MaterialTheme.typography.labelMedium, color = TextSecondary)
-                Text("离线也能看的视频海报墙", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-                Text("先展示本地缓存，再尝试同步服务器影片", style = MaterialTheme.typography.bodySmall, color = TextSecondary, modifier = Modifier.padding(top = 4.dp))
-                Row(modifier = Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = { viewModel.refreshVideos() }, enabled = !state.isLoading) {
-                        if (state.isLoading) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp) else Icon(Icons.Default.Refresh, null, Modifier.size(16.dp))
-                        Spacer(Modifier.width(4.dp))
-                        Text("刷新影片")
+            Column(Modifier.padding(20.dp)) {
+                Text(
+                    "Emby Video Wall",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = TextSecondary
+                )
+                Text(
+                    "离线也能看的视频海报墙",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.ExtraBold
+                )
+                Text(
+                    "先展示本地缓存，再尝试同步服务器影片",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+                HorizontalFloatingToolbar(
+                    expanded = true,
+                    modifier = Modifier.padding(top = 16.dp),
+                    content = {
+                        Button(
+                            onClick = { viewModel.refreshVideos() },
+                            enabled = !state.isLoading
+                        ) {
+                            if (state.isLoading) CircularProgressIndicator(
+                                Modifier.size(18.dp),
+                                strokeWidth = 2.dp
+                            )
+                            else Icon(Icons.Default.Refresh, null, Modifier.size(18.dp))
+                            Spacer(Modifier.width(4.dp))
+                            Text("刷新影片")
+                        }
                     }
-                }
+                )
             }
         }
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(16.dp))
 
         // Status strip
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            StatCard("数据源", if (state.isUsingCache) "本地缓存" else "服务器", CardCoral, Modifier.weight(1f))
-            StatCard("影片数", "${viewModel.filteredVideos.size}", CardMint, Modifier.weight(1f))
-            StatCard("上次同步", viewModel.lastSyncLabel, CardSky, Modifier.weight(1f))
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            StatCard("数据源", if (state.isUsingCache) "本地缓存" else "服务器", CardCoral, AccentCoralSoft, Modifier.weight(1f))
+            StatCard("影片数", "${viewModel.filteredVideos.size}", CardMint, AccentTealSoft, Modifier.weight(1f))
+            StatCard("上次同步", viewModel.lastSyncLabel, CardSky, AccentAmberSoft, Modifier.weight(1f))
         }
 
         // Status message bar
         state.statusMessage?.let { msg ->
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(12.dp))
             Surface(
                 color = SurfaceLight,
-                shape = MaterialTheme.shapes.small,
+                shape = ExpressiveShapes.Pill,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(msg, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), style = MaterialTheme.typography.labelSmall, color = TextSecondary)
+                Text(
+                    msg,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = TextSecondary
+                )
             }
         }
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(12.dp))
 
         // Search & Sort
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             OutlinedTextField(
-                value = state.searchKeyword, onValueChange = viewModel::updateSearchKeyword,
-                label = { Text("搜索标题") }, leadingIcon = { Icon(Icons.Default.Search, null) },
+                value = state.searchKeyword,
+                onValueChange = viewModel::updateSearchKeyword,
+                label = { Text("搜索标题") },
+                leadingIcon = { Icon(Icons.Default.Search, null) },
                 trailingIcon = {
                     if (state.searchKeyword.isNotEmpty()) {
                         IconButton(onClick = { viewModel.updateSearchKeyword("") }) {
@@ -90,34 +124,44 @@ fun VideoWallScreen(viewModel: VideoWallViewModel = viewModel()) {
                         }
                     }
                 },
-                modifier = Modifier.weight(1f), singleLine = true
+                modifier = Modifier.weight(1f),
+                singleLine = true,
+                shape = ExpressiveShapes.Pill
             )
-            IconButton(onClick = {
-                val new = if (state.sortBy == SortType.RECENT) SortType.TITLE else SortType.RECENT
-                viewModel.setSortBy(new)
-            }) { Icon(Icons.Default.Sort, state.sortBy.name) }
+            IconButton(
+                onClick = {
+                    val new = if (state.sortBy == SortType.RECENT) SortType.TITLE else SortType.RECENT
+                    viewModel.setSortBy(new)
+                },
+                modifier = Modifier.size(48.dp)
+            ) { Icon(Icons.Default.Sort, state.sortBy.name) }
         }
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(12.dp))
 
         // Video grid
         if (state.isLoading && videos.isEmpty()) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
         } else if (videos.isEmpty()) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(viewModel.emptyStateMessage, style = MaterialTheme.typography.bodyLarge, color = TextMuted)
+                Text(
+                    viewModel.emptyStateMessage,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = TextMuted
+                )
             }
         } else {
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 150.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.weight(1f)
             ) {
                 items(videos, key = { it.id }) { item ->
                     Card(
                         Modifier.aspectRatio(0.7f).clickable { viewModel.selectVideo(item) },
-                        colors = CardDefaults.cardColors(containerColor = Surface)
+                        colors = CardDefaults.cardColors(containerColor = Surface),
+                        shape = ExpressiveShapes.SquircleLarge
                     ) {
                         Column {
                             Box(
@@ -136,26 +180,39 @@ fun VideoWallScreen(viewModel: VideoWallViewModel = viewModel()) {
                                     Box(
                                         modifier = Modifier
                                             .fillMaxSize()
-                                            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                                            .clip(ExpressiveShapes.SquircleLarge)
                                             .background(posterColor(item.id)),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        Text(item.title.take(1), fontSize = 32.sp, fontWeight = FontWeight.Bold, color = Color.White.copy(alpha = 0.8f))
+                                        Text(
+                                            item.title.take(1),
+                                            fontSize = 36.sp,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = Color.White.copy(alpha = 0.9f)
+                                        )
                                     }
                                 }
                                 if (item.year.isNotBlank()) {
                                     Surface(
-                                        modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
-                                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
-                                        shape = MaterialTheme.shapes.small
+                                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp),
+                                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+                                        shape = ExpressiveShapes.Pill
                                     ) {
-                                        Text(item.year, Modifier.padding(horizontal = 6.dp, vertical = 2.dp), fontSize = 11.sp)
+                                        Text(
+                                            item.year,
+                                            Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
                                     }
                                 }
                             }
                             Text(
-                                item.title, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.labelMedium, maxLines = 1, overflow = TextOverflow.Ellipsis
+                                item.title,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                style = MaterialTheme.typography.labelLarge,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
@@ -165,26 +222,33 @@ fun VideoWallScreen(viewModel: VideoWallViewModel = viewModel()) {
             // Pagination
             if (viewModel.showPagination) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextButton(
-                        onClick = { viewModel.changePage(state.currentPage - 1) },
-                        enabled = state.currentPage > 1
-                    ) { Text("上一页") }
-                    viewModel.visiblePages.forEach { page ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         TextButton(
-                            onClick = { viewModel.changePage(page) },
-                            colors = if (page == state.currentPage)
-                                ButtonDefaults.textButtonColors(contentColor = Primary)
-                            else ButtonDefaults.textButtonColors(contentColor = TextSecondary)
-                        ) { Text("$page", fontWeight = if (page == state.currentPage) FontWeight.Bold else FontWeight.Normal) }
+                            onClick = { viewModel.changePage(state.currentPage - 1) },
+                            enabled = state.currentPage > 1
+                        ) { Text("上一页") }
+                        viewModel.visiblePages.forEach { page ->
+                            TextButton(
+                                onClick = { viewModel.changePage(page) },
+                                colors = if (page == state.currentPage)
+                                    ButtonDefaults.textButtonColors(contentColor = Primary)
+                                else ButtonDefaults.textButtonColors(contentColor = TextSecondary)
+                            ) {
+                                Text(
+                                    "$page",
+                                    fontWeight = if (page == state.currentPage) FontWeight.Bold else FontWeight.Normal
+                                )
+                            }
+                        }
+                        TextButton(
+                            onClick = { viewModel.changePage(state.currentPage + 1) },
+                            enabled = state.currentPage < viewModel.totalPages
+                        ) { Text("下一页") }
                     }
-                    TextButton(
-                        onClick = { viewModel.changePage(state.currentPage + 1) },
-                        enabled = state.currentPage < viewModel.totalPages
-                    ) { Text("下一页") }
                 }
             }
         }
@@ -226,11 +290,27 @@ private fun posterColor(id: String): Color {
 }
 
 @Composable
-fun StatCard(label: String, value: String, color: androidx.compose.ui.graphics.Color, modifier: Modifier = Modifier) {
-    Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.3f))) {
-        Column(Modifier.padding(12.dp)) {
-            Text(label, style = MaterialTheme.typography.labelSmall, color = color)
-            Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+fun StatCard(
+    label: String,
+    value: String,
+    color: androidx.compose.ui.graphics.Color,
+    containerColor: androidx.compose.ui.graphics.Color,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+        shape = ExpressiveShapes.StatCard
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Text(label, style = MaterialTheme.typography.labelSmall, color = TextSecondary)
+            Text(
+                value,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.ExtraBold,
+                color = color,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         }
     }
 }

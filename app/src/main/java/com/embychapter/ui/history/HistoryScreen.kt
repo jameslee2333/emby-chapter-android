@@ -28,51 +28,97 @@ fun HistoryScreen(viewModel: HistoryViewModel = viewModel()) {
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Hero
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Secondary.copy(alpha = 0.2f))
+                colors = CardDefaults.cardColors(containerColor = Secondary.copy(alpha = 0.18f)),
+                shape = ExpressiveShapes.HeroCard
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Emby Insight Deck", style = MaterialTheme.typography.labelMedium, color = TextSecondary)
-                    Text("播放历史、继续观看与最近记录", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-                    Row(modifier = Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        OutlinedButton(onClick = { viewModel.refreshCurrentSection() }, enabled = !state.isLoading) {
-                            if (state.isLoading) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
-                            else Icon(Icons.Default.Refresh, null, Modifier.size(16.dp))
-                            Spacer(Modifier.width(4.dp))
-                            Text("刷新当前")
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Text(
+                        "Emby Insight Deck",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = TextSecondary
+                    )
+                    Text(
+                        "播放历史、继续观看与最近记录",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                    HorizontalFloatingToolbar(
+                        expanded = true,
+                        modifier = Modifier.padding(top = 16.dp),
+                        content = {
+                            ButtonGroup(
+                                overflowIndicator = { menuState ->
+                                    ButtonGroupDefaults.OverflowIndicator(menuState = menuState)
+                                }
+                            ) {
+                                clickableItem(
+                                    onClick = { viewModel.refreshCurrentSection() },
+                                    label = "刷新当前",
+                                    icon = {
+                                        if (state.isLoading) CircularProgressIndicator(
+                                            Modifier.size(18.dp),
+                                            strokeWidth = 2.dp
+                                        )
+                                        else Icon(Icons.Default.Refresh, null, Modifier.size(18.dp))
+                                    },
+                                    enabled = !state.isLoading
+                                )
+                                clickableItem(
+                                    onClick = { viewModel.refreshAll() },
+                                    label = "刷新全部",
+                                    enabled = !state.isLoading
+                                )
+                            }
                         }
-                        Button(onClick = { viewModel.refreshAll() }, enabled = !state.isLoading) {
-                            Text("刷新全部")
-                        }
-                    }
+                    )
                 }
             }
         }
 
         // Config panel
         item {
-            Card(colors = CardDefaults.cardColors(containerColor = Surface)) {
-                Column(Modifier.padding(12.dp)) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Surface),
+                shape = ExpressiveShapes.SquircleLarge
+            ) {
+                Column(Modifier.padding(20.dp)) {
                     OutlinedTextField(
-                        value = state.apiBaseUrl, onValueChange = viewModel::updateApiBaseUrl,
-                        label = { Text("历史服务地址") }, placeholder = { Text("http://192.168.1.8:3000") },
-                        modifier = Modifier.fillMaxWidth(), singleLine = true
+                        value = state.apiBaseUrl,
+                        onValueChange = viewModel::updateApiBaseUrl,
+                        label = { Text("历史服务地址") },
+                        placeholder = { Text("http://192.168.1.8:3000") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        shape = ExpressiveShapes.Pill
                     )
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(12.dp))
                     OutlinedTextField(
-                        value = state.historyUserId, onValueChange = viewModel::updateHistoryUserId,
-                        label = { Text("用户 ID 过滤") }, placeholder = { Text("留空为全部用户") },
-                        modifier = Modifier.fillMaxWidth(), singleLine = true
+                        value = state.historyUserId,
+                        onValueChange = viewModel::updateHistoryUserId,
+                        label = { Text("用户 ID 过滤") },
+                        placeholder = { Text("留空为全部用户") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        shape = ExpressiveShapes.Pill
                     )
-                    Spacer(Modifier.height(8.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(onClick = { viewModel.saveConfigAndRefresh() }) { Text("保存并刷新") }
-                        OutlinedButton(onClick = { viewModel.clearUserFilter() }) { Text("清空用户过滤") }
+                    Spacer(Modifier.height(16.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Button(
+                            onClick = { viewModel.saveConfigAndRefresh() },
+                            modifier = Modifier.weight(1f),
+                            shape = ExpressiveShapes.Pill
+                        ) { Text("保存并刷新") }
+                        OutlinedButton(
+                            onClick = { viewModel.clearUserFilter() },
+                            modifier = Modifier.weight(1f),
+                            shape = ExpressiveShapes.Pill
+                        ) { Text("清空用户过滤") }
                     }
                 }
             }
@@ -80,52 +126,92 @@ fun HistoryScreen(viewModel: HistoryViewModel = viewModel()) {
 
         // Stats cards with derived metrics
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                StatCard("总播放", HistoryViewModel.formatCount(state.stats.totalPlays), CardCoral, Modifier.weight(1f))
-                StatCard("完成", "${HistoryViewModel.formatCount(state.stats.finishedPlays)} (${viewModel.completionRate}%)", CardMint, Modifier.weight(1f))
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                StatCard(
+                    "总播放",
+                    HistoryViewModel.formatCount(state.stats.totalPlays),
+                    CardCoral,
+                    AccentCoralSoft,
+                    Modifier.weight(1f)
+                )
+                StatCard(
+                    "完成",
+                    "${HistoryViewModel.formatCount(state.stats.finishedPlays)} (${viewModel.completionRate}%)",
+                    CardMint,
+                    AccentTealSoft,
+                    Modifier.weight(1f)
+                )
             }
         }
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                StatCard("总时长", HistoryViewModel.formatDuration(state.stats.totalDuration), CardSky, Modifier.weight(1f))
-                StatCard("平均观看", viewModel.averageWatchDuration, CardAmber, Modifier.weight(1f))
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                StatCard(
+                    "总时长",
+                    HistoryViewModel.formatDuration(state.stats.totalDuration),
+                    CardSky,
+                    AccentAmberSoft,
+                    Modifier.weight(1f)
+                )
+                StatCard(
+                    "平均观看",
+                    viewModel.averageWatchDuration,
+                    CardAmber,
+                    AccentAmberSoft,
+                    Modifier.weight(1f)
+                )
             }
         }
 
         // Section tabs
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 SectionType.entries.forEach { type ->
-                    FilterChip(
-                        selected = state.currentSection == type,
-                        onClick = { viewModel.switchSection(type) },
-                        label = { Text(when (type) {
-                            SectionType.HISTORY -> "播放历史"
-                            SectionType.CONTINUE -> "继续观看"
-                            SectionType.RECENT -> "最近播放"
-                            SectionType.STATS -> "统计数据"
-                        }) }
-                    )
+                    val label = when (type) {
+                        SectionType.HISTORY -> "播放历史"
+                        SectionType.CONTINUE -> "继续观看"
+                        SectionType.RECENT -> "最近播放"
+                        SectionType.STATS -> "统计数据"
+                    }
+                    if (state.currentSection == type) {
+                        Button(onClick = { viewModel.switchSection(type) }) { Text(label) }
+                    } else {
+                        OutlinedButton(onClick = { viewModel.switchSection(type) }) { Text(label) }
+                    }
                 }
             }
         }
 
         // Section badge (filtered count)
         item {
-            Text(viewModel.filteredCountLabel, style = MaterialTheme.typography.labelMedium, color = TextSecondary)
+            Text(
+                viewModel.filteredCountLabel,
+                style = MaterialTheme.typography.labelMedium,
+                color = TextSecondary
+            )
         }
 
         // Filter toolbar (only for history & recent sections)
         if (viewModel.supportsFilter) {
             item {
-                Card(colors = CardDefaults.cardColors(containerColor = Surface)) {
-                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Surface),
+                    shape = ExpressiveShapes.SquircleLarge
+                ) {
+                    Column(
+                        Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
                         OutlinedTextField(
                             value = state.searchKeyword,
                             onValueChange = viewModel::updateSearchKeyword,
                             label = { Text("搜索标题或原始标题") },
                             leadingIcon = { Icon(Icons.Default.Search, null) },
-                            modifier = Modifier.fillMaxWidth(), singleLine = true
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            shape = ExpressiveShapes.Pill
                         )
                         // User filter dropdown
                         FilterDropdown(
@@ -163,16 +249,27 @@ fun HistoryScreen(viewModel: HistoryViewModel = viewModel()) {
             }
         } else if (data.isEmpty() && !state.isLoading) {
             item {
-                Card(Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = SurfaceLight)) {
-                    Text("暂无数据", modifier = Modifier.padding(24.dp), style = MaterialTheme.typography.bodyLarge)
+                Card(
+                    Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = SurfaceLight),
+                    shape = ExpressiveShapes.SquircleLarge
+                ) {
+                    Text(
+                        "暂无数据",
+                        modifier = Modifier.padding(24.dp),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
         } else if (!state.isLoading || data.isNotEmpty()) {
             // Table header (sortable, not for continue section)
             if (state.currentSection != SectionType.CONTINUE) {
                 item {
-                    Card(colors = CardDefaults.cardColors(containerColor = SurfaceLight)) {
-                        Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = SurfaceLight),
+                        shape = ExpressiveShapes.SquircleLarge
+                    ) {
+                        Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                             SortHeader("标题", "title", viewModel, Modifier.weight(2.2f))
                             SortHeader("类型", "type", viewModel, Modifier.weight(1f))
                             SortHeader("用户", "user_name", viewModel, Modifier.weight(1f))
@@ -197,26 +294,33 @@ fun HistoryScreen(viewModel: HistoryViewModel = viewModel()) {
             if (viewModel.showPagination) {
                 item {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TextButton(
-                            onClick = { viewModel.changePage(state.currentPage - 1) },
-                            enabled = state.currentPage > 1
-                        ) { Text("上一页") }
-                        viewModel.visiblePages.forEach { page ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             TextButton(
-                                onClick = { viewModel.changePage(page) },
-                                colors = if (page == state.currentPage)
-                                    ButtonDefaults.textButtonColors(contentColor = Primary)
-                                else ButtonDefaults.textButtonColors(contentColor = TextSecondary)
-                            ) { Text("$page", fontWeight = if (page == state.currentPage) FontWeight.Bold else FontWeight.Normal) }
+                                onClick = { viewModel.changePage(state.currentPage - 1) },
+                                enabled = state.currentPage > 1
+                            ) { Text("上一页") }
+                            viewModel.visiblePages.forEach { page ->
+                                TextButton(
+                                    onClick = { viewModel.changePage(page) },
+                                    colors = if (page == state.currentPage)
+                                        ButtonDefaults.textButtonColors(contentColor = Primary)
+                                    else ButtonDefaults.textButtonColors(contentColor = TextSecondary)
+                                ) {
+                                    Text(
+                                        "$page",
+                                        fontWeight = if (page == state.currentPage) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                }
+                            }
+                            TextButton(
+                                onClick = { viewModel.changePage(state.currentPage + 1) },
+                                enabled = state.currentPage < viewModel.totalPages
+                            ) { Text("下一页") }
                         }
-                        TextButton(
-                            onClick = { viewModel.changePage(state.currentPage + 1) },
-                            enabled = state.currentPage < viewModel.totalPages
-                        ) { Text("下一页") }
                     }
                 }
             }
@@ -246,7 +350,11 @@ private fun SortHeader(label: String, field: String, viewModel: HistoryViewModel
 private fun FilterDropdown(label: String, options: List<String>, onSelect: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     Box {
-        OutlinedButton(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth()) {
+        OutlinedButton(
+            onClick = { expanded = true },
+            modifier = Modifier.fillMaxWidth(),
+            shape = ExpressiveShapes.Pill
+        ) {
             Text(label, modifier = Modifier.weight(1f))
             Icon(Icons.Default.ArrowDropDown, null)
         }
@@ -261,56 +369,106 @@ private fun FilterDropdown(label: String, options: List<String>, onSelect: (Stri
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HistoryRowCard(item: PlayRecord, viewModel: HistoryViewModel) {
-    Card(
-        Modifier.fillMaxWidth().clickable { viewModel.openDetail(item) },
-        colors = CardDefaults.cardColors(containerColor = Surface)
-    ) {
-        Column(Modifier.padding(12.dp)) {
-            Row(verticalAlignment = Alignment.Top) {
-                Column(Modifier.weight(2.2f)) {
-                    Text(item.title ?: "未命名", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, maxLines = 1)
-                    Text(item.originalTitle ?: "-", style = MaterialTheme.typography.labelSmall, color = TextMuted, maxLines = 1)
-                }
-                Text(HistoryViewModel.getTypeLabel(item.type), style = MaterialTheme.typography.labelSmall, color = Primary, modifier = Modifier.weight(1f))
-                Text(item.userName ?: item.userId ?: "未知", style = MaterialTheme.typography.labelSmall, color = TextSecondary, modifier = Modifier.weight(1f))
-                Column(modifier = Modifier.weight(1.2f)) {
-                    Text(HistoryViewModel.formatDate(item.playedAt ?: item.lastPlayedAt), style = MaterialTheme.typography.labelSmall, color = TextPrimary)
-                    Text("${HistoryViewModel.formatPercent(item.progress)} · ${if ((item.isFinished ?: 0) == 1) "已完成" else "未完成"}", style = MaterialTheme.typography.labelSmall, color = TextMuted, fontSize = 11.sp)
-                }
+    ListItem(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { viewModel.openDetail(item) },
+        headlineContent = {
+            Text(
+                item.title ?: "未命名",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
+        },
+        supportingContent = {
+            Text(
+                item.originalTitle ?: "-",
+                style = MaterialTheme.typography.labelSmall,
+                color = TextMuted,
+                maxLines = 1
+            )
+        },
+        overlineContent = {
+            Text(
+                HistoryViewModel.getTypeLabel(item.type),
+                style = MaterialTheme.typography.labelSmall,
+                color = Primary
+            )
+        },
+        trailingContent = {
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    HistoryViewModel.formatDate(item.playedAt ?: item.lastPlayedAt),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = TextPrimary
+                )
+                Text(
+                    "${HistoryViewModel.formatPercent(item.progress)} · ${if ((item.isFinished ?: 0) == 1) "已完成" else "未完成"}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = TextMuted,
+                    fontSize = 11.sp
+                )
             }
-        }
-    }
+        },
+        colors = ListItemDefaults.colors(containerColor = Surface),
+        shape = ExpressiveShapes.Pill
+    )
 }
 
 @Composable
 private fun ContinueCard(item: PlayRecord, viewModel: HistoryViewModel) {
     Card(
         Modifier.fillMaxWidth().clickable { viewModel.openDetail(item) },
-        colors = CardDefaults.cardColors(containerColor = Surface)
+        colors = CardDefaults.cardColors(containerColor = Surface),
+        shape = ExpressiveShapes.SquircleLarge
     ) {
-        Column(Modifier.padding(12.dp)) {
-            Text(item.title ?: "未命名条目", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text(HistoryViewModel.formatDateTime(item.lastPlayedAt ?: item.playedAt), style = MaterialTheme.typography.labelSmall, color = TextSecondary)
+        Column(Modifier.padding(20.dp)) {
+            Text(
+                item.title ?: "未命名条目",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                HistoryViewModel.formatDateTime(item.lastPlayedAt ?: item.playedAt),
+                style = MaterialTheme.typography.labelSmall,
+                color = TextSecondary,
+                modifier = Modifier.padding(top = 4.dp)
+            )
             Row(
-                modifier = Modifier.padding(top = 8.dp),
+                modifier = Modifier.padding(top = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(HistoryViewModel.formatPercent(item.progress), style = MaterialTheme.typography.labelMedium, color = Warning, modifier = Modifier.weight(1f))
+                Text(
+                    HistoryViewModel.formatPercent(item.progress),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = Warning,
+                    modifier = Modifier.weight(1f)
+                )
             }
             if (item.progress != null) {
                 LinearProgressIndicator(
                     progress = { (item.progress ?: 0) / 100f },
-                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                     color = if ((item.isFinished ?: 0) == 1) Success else Warning,
                     trackColor = SurfaceLight
                 )
             }
-            Row(modifier = Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("已看 ${HistoryViewModel.formatDuration(item.position ?: 0)}", style = MaterialTheme.typography.labelSmall, color = TextMuted)
-                Text("总长 ${HistoryViewModel.formatDuration(item.duration ?: 0)}", style = MaterialTheme.typography.labelSmall, color = TextMuted)
+            Row(modifier = Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    "已看 ${HistoryViewModel.formatDuration(item.position ?: 0)}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = TextMuted
+                )
+                Text(
+                    "总长 ${HistoryViewModel.formatDuration(item.duration ?: 0)}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = TextMuted
+                )
             }
         }
     }
@@ -345,17 +503,38 @@ private fun DetailDialog(record: PlayRecord, viewModel: HistoryViewModel) {
 @Composable
 private fun DetailRow(label: String, value: String) {
     Row(Modifier.padding(vertical = 4.dp)) {
-        Text("$label: ", style = MaterialTheme.typography.bodySmall, color = TextSecondary, modifier = Modifier.width(100.dp))
+        Text(
+            "$label: ",
+            style = MaterialTheme.typography.bodySmall,
+            color = TextSecondary,
+            modifier = Modifier.width(100.dp)
+        )
         Text(value, style = MaterialTheme.typography.bodySmall, color = TextPrimary)
     }
 }
 
 @Composable
-fun StatCard(label: String, value: String, color: androidx.compose.ui.graphics.Color, modifier: Modifier = Modifier) {
-    Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.3f))) {
-        Column(Modifier.padding(12.dp)) {
-            Text(label, style = MaterialTheme.typography.labelSmall, color = color)
-            Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+fun StatCard(
+    label: String,
+    value: String,
+    color: androidx.compose.ui.graphics.Color,
+    containerColor: androidx.compose.ui.graphics.Color,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+        shape = ExpressiveShapes.StatCard
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Text(label, style = MaterialTheme.typography.labelSmall, color = TextSecondary)
+            Text(
+                value,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.ExtraBold,
+                color = color,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         }
     }
 }
