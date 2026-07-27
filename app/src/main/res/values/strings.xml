@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Emby 工具箱</string>
+    <string name="widget_description">Emby 工具箱桌面小组件，快速查看播放状态</string>
 </resources>
