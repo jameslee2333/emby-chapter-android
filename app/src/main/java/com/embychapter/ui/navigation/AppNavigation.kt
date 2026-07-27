@@ -15,6 +15,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.embychapter.ui.chapter.ChapterScreen
 import com.embychapter.ui.history.HistoryScreen
+import com.embychapter.ui.theme.SurfaceDark
 import com.embychapter.ui.videowall.VideoWallScreen
 
 sealed class Screen(val route: String, val label: String) {

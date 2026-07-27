@@ -44,8 +44,7 @@ fun EmbyWidgetContent(context: Context) {
     ) {
         // Header
         Row(
-            modifier = GlanceModifier.fillMaxWidth(),
-            verticalAlignment = VerticalAlignment.Center
+            modifier = GlanceModifier.fillMaxWidth()
         ) {
             Text(
                 text = "\uD83C\uDFAC",
@@ -76,11 +75,7 @@ fun EmbyWidgetContent(context: Context) {
         Button(
             text = "打开App",
             onClick = actionStartActivity(Intent(context, MainActivity::class.java)),
-            modifier = GlanceModifier.padding(top = 12.dp),
-            colors = androidx.glance.ButtonDefaults.buttonColors(
-                backgroundColor = ColorProvider(android.graphics.Color.parseColor("#E19B58")),
-                textColor = ColorProvider(android.graphics.Color.parseColor("#1C1A18"))
-            )
+            modifier = GlanceModifier.padding(top = 12.dp)
         )
     }
 }
