@@ -197,7 +197,7 @@ private fun ChapterListCard(state: ChapterUiState, viewModel: ChapterViewModel) 
                     }
                 }
 
-                itemsIndexed(state.chapters) { index, chapter ->
+                state.chapters.forEachIndexed { index, chapter ->
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)

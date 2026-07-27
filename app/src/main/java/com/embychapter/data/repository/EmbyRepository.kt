@@ -16,7 +16,7 @@ class EmbyRepository {
     suspend fun authenticate(serverUrl: String, username: String, password: String): Result<AuthResponse> {
         setBaseUrl(serverUrl)
         return try {
-            val response = requireApi().authenticate(AuthRequest(username, password))
+            val response = requireApi().authenticate(request = AuthRequest(username, password))
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!)
             } else {

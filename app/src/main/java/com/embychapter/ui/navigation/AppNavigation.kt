@@ -55,7 +55,7 @@ fun AppNavigation() {
         },
         bottomBar = {
             NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surfaceDark,
+                containerColor = SurfaceDark,
                 contentColor = MaterialTheme.colorScheme.onSurface
             ) {
                 bottomNavItems.forEach { (screen, icon) ->

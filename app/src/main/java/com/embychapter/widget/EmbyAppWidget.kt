@@ -1,10 +1,8 @@
 package com.embychapter.widget
 
 import android.content.Context
-import android.widget.RemoteViews
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import android.content.Intent
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.*
@@ -42,14 +40,12 @@ fun EmbyWidgetContent(context: Context) {
             .cornerRadius(16.dp)
             .background(
                 ColorProvider(android.graphics.Color.parseColor("#13222B"))
-            ),
-        verticalAlignment = VerticalAlignment.Top
+            )
     ) {
         // Header
         Row(
             modifier = GlanceModifier.fillMaxWidth(),
-            horizontalAlignment = HorizontalAlignment.Start,
-            verticalAlignment = VerticalAlignment.CenterVertically
+            verticalAlignment = VerticalAlignment.Center
         ) {
             Text(
                 text = "\uD83C\uDFAC",
@@ -79,9 +75,9 @@ fun EmbyWidgetContent(context: Context) {
         // Action button
         Button(
             text = "打开App",
-            onClick = actionStartActivity<MainActivity>(),
+            onClick = actionStartActivity(Intent(context, MainActivity::class.java)),
             modifier = GlanceModifier.padding(top = 12.dp),
-            style = androidx.glance.ButtonDefaults.buttonStyle(
+            colors = androidx.glance.ButtonDefaults.buttonColors(
                 backgroundColor = ColorProvider(android.graphics.Color.parseColor("#E19B58")),
                 textColor = ColorProvider(android.graphics.Color.parseColor("#1C1A18"))
             )
