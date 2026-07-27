@@ -8,10 +8,18 @@ class EmbyRepository {
     private var apiService: com.embychapter.data.api.EmbyApiService? = null
 
     fun setBaseUrl(url: String) {
-        apiService = RetrofitProvider.createEmbyApi(url)
+        apiService = if (url.isBlank()) {
+            null
+        } else {
+            try {
+                RetrofitProvider.createEmbyApi(url)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        }
     }
 
-    private fun requireApi() = apiService ?: throw IllegalStateException("EmbyApiService not initialized. Call setBaseUrl() first.")
+    private fun requireApi() = apiService ?: throw IllegalStateException("请先配置 Emby 服务器地址")
 
     suspend fun authenticate(serverUrl: String, username: String, password: String): Result<AuthResponse> {
         setBaseUrl(serverUrl)

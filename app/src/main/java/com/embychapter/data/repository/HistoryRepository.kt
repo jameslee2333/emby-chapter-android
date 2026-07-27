@@ -9,10 +9,18 @@ class HistoryRepository {
     private var apiService: com.embychapter.data.api.HistoryApiService? = null
 
     fun setBaseUrl(url: String) {
-        apiService = RetrofitProvider.createHistoryApi(url)
+        apiService = if (url.isBlank()) {
+            null
+        } else {
+            try {
+                RetrofitProvider.createHistoryApi(url)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        }
     }
 
-    private fun requireApi() = apiService ?: throw IllegalStateException("HistoryApiService not initialized")
+    private fun requireApi() = apiService ?: throw IllegalStateException("请先配置历史服务地址")
 
     suspend fun getHistory(userId: String? = null): Result<List<PlayRecord>> {
         return try {

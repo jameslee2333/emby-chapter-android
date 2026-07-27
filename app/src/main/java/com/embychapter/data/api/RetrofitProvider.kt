@@ -27,8 +27,17 @@ object RetrofitProvider {
         .addInterceptor(loggingInterceptor)
         .build()
 
+    private fun requireValidBaseUrl(baseUrl: String): String {
+        val trimmed = baseUrl.trim()
+        require(trimmed.isNotBlank()) { "服务器地址不能为空" }
+        require(trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+            "服务器地址必须以 http:// 或 https:// 开头，当前值: $trimmed"
+        }
+        return trimmed.trimEnd('/') + "/"
+    }
+
     fun createEmbyApi(baseUrl: String): EmbyApiService {
-        val normalizedUrl = baseUrl.trimEnd('/') + "/"
+        val normalizedUrl = requireValidBaseUrl(baseUrl)
         return Retrofit.Builder()
             .baseUrl(normalizedUrl)
             .client(createOkHttpClient())
@@ -38,7 +47,7 @@ object RetrofitProvider {
     }
 
     fun createHistoryApi(baseUrl: String): HistoryApiService {
-        val normalizedUrl = baseUrl.trimEnd('/') + "/"
+        val normalizedUrl = requireValidBaseUrl(baseUrl)
         return Retrofit.Builder()
             .baseUrl(normalizedUrl)
             .client(createOkHttpClient())

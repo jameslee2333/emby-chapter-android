@@ -1,8 +1,9 @@
 package com.embychapter.ui.chapter
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
@@ -11,10 +12,12 @@ import androidx.compose.material.icons.filled.Login
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.embychapter.ui.theme.*
@@ -24,7 +27,6 @@ import com.embychapter.ui.theme.*
 fun ChapterScreen(viewModel: ChapterViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsState()
 
-    // Handle snackbar
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(state.statusMessage) {
         state.statusMessage?.let {
@@ -53,24 +55,25 @@ fun ChapterScreen(viewModel: ChapterViewModel = viewModel()) {
                 item { LoginForm(state, viewModel) }
             }
 
-            // Quick actions (if logged in and playing)
-            if (state.isLoggedIn && state.currentSession != null) {
-                item {
-                    QuickActionCard(state, viewModel)
-                }
-                item { Spacer(Modifier.height(8.dp)) }
+            // Overview stats bar (only when logged in)
+            if (state.isLoggedIn) {
+                item { OverviewStatsBar(state) }
+            }
 
-                // Chapter list
-                item {
-                    ChapterListCard(state, viewModel)
-                }
+            // Quick actions + chapter list (if logged in and playing)
+            if (state.isLoggedIn && state.currentSession != null) {
+                item { NowPlayingCard(state) }
+                item { Spacer(Modifier.height(4.dp)) }
+                item { QuickActionCard(state, viewModel) }
+                item { Spacer(Modifier.height(4.dp)) }
+                item { ChapterListCard(state, viewModel) }
             } else if (state.isLoggedIn) {
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(containerColor = CardMint.copy(alpha = 0.2f))
                     ) {
-                        Column(modifier = Modifier.padding(24.dp).fillMaxWidth(), horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                        Column(modifier = Modifier.padding(24.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                             Text("未检测到正在播放的视频", style = MaterialTheme.typography.titleMedium)
                             Text("请先在电脑/电视播放，再点击刷新", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
                         }
@@ -80,6 +83,24 @@ fun ChapterScreen(viewModel: ChapterViewModel = viewModel()) {
 
             item { Spacer(Modifier.height(16.dp)) }
         }
+    }
+
+    // Delete confirmation dialog
+    if (state.showDeleteConfirm) {
+        AlertDialog(
+            onDismissRequest = { viewModel.cancelDelete() },
+            title = { Text("确认删除") },
+            text = { Text("确定要删除选中的 ${state.selectedCount} 个章节吗？此操作不可撤销。") },
+            confirmButton = {
+                TextButton(
+                    onClick = { viewModel.confirmDelete() },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Danger)
+                ) { Text("删除") }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.cancelDelete() }) { Text("取消") }
+            }
+        )
     }
 }
 
@@ -96,16 +117,87 @@ private fun HeroSection(isLoggedIn: Boolean, hasSession: Boolean, onRefresh: () 
             Text("把常用操作集中到顶部，进入页面就能直接刷新、加章节、查看历史。", style = MaterialTheme.typography.bodyMedium, color = TextSecondary, modifier = Modifier.padding(top = 8.dp))
 
             Row(modifier = Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                AssistChip(
-                    onClick = onRefresh,
-                    label = { Text("刷新") },
-                    leadingIcon = { Icon(Icons.Default.Refresh, null, modifier = Modifier.size(16.dp)) }
-                )
                 if (isLoggedIn) {
+                    AssistChip(
+                        onClick = onRefresh,
+                        label = { Text("刷新") },
+                        leadingIcon = { Icon(Icons.Default.Refresh, null, modifier = Modifier.size(16.dp)) }
+                    )
                     AssistChip(
                         onClick = onLogout,
                         label = { Text("退出", color = Danger) },
                         leadingIcon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, null, modifier = Modifier.size(16.dp), tint = Danger) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OverviewStatsBar(state: ChapterUiState) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        MiniStatCard("登录", "已登录", CardMint, Modifier.weight(1f))
+        MiniStatCard("章节", "${state.chapters.size}", CardCoral, Modifier.weight(1f))
+        MiniStatCard("已选", "${state.selectedCount}", CardSky, Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun MiniStatCard(label: String, value: String, color: androidx.compose.ui.graphics.Color, modifier: Modifier = Modifier) {
+    Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.25f))) {
+        Column(Modifier.padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(label, style = MaterialTheme.typography.labelSmall, color = color)
+            Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+private fun NowPlayingCard(state: ChapterUiState) {
+    val session = state.currentSession ?: return
+    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Surface)) {
+        Row(modifier = Modifier.padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            // Poster image
+            if (session.imageUrl != null) {
+                AsyncImage(
+                    model = session.imageUrl,
+                    contentDescription = session.title,
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(120.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(120.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(session.title.take(1), style = MaterialTheme.typography.headlineMedium, color = TextSecondary)
+                }
+            }
+
+            // Playing info
+            Column(modifier = Modifier.weight(1f)) {
+                Text("正在播放", style = MaterialTheme.typography.labelSmall, color = Primary)
+                Text(session.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 2)
+                Spacer(Modifier.height(4.dp))
+                Text("设备: ${session.deviceName}", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                Text("进度: ${session.timeStr}", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                Spacer(Modifier.height(4.dp))
+                Surface(
+                    color = Success.copy(alpha = 0.2f),
+                    shape = MaterialTheme.shapes.small
+                ) {
+                    Text(
+                        "PLAYING",
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Success
                     )
                 }
             }
@@ -191,7 +283,9 @@ private fun ChapterListCard(state: ChapterUiState, viewModel: ChapterViewModel) 
                     }
                     TextButton(onClick = viewModel::fetchSessions) { Text("刷新") }
                     if (state.selectedCount > 0) {
-                        TextButton(onClick = viewModel::deleteSelectedChapters) {
+                        TextButton(onClick = viewModel::requestDelete) {
+                            Icon(Icons.Default.Delete, null, modifier = Modifier.size(16.dp), tint = Danger)
+                            Spacer(Modifier.width(4.dp))
                             Text("删除选中", color = Danger)
                         }
                     }
@@ -199,12 +293,12 @@ private fun ChapterListCard(state: ChapterUiState, viewModel: ChapterViewModel) 
 
                 state.chapters.forEachIndexed { index, chapter ->
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { viewModel.toggleItem(index) },
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Checkbox(
                             checked = chapter.selected,
-                            onCheckedChange = { viewModel.toggleItem(index) }
+                            onCheckedChange = null
                         )
                         Column {
                             Text(chapter.displayTime, style = MaterialTheme.typography.labelLarge, color = Primary)

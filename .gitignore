@@ -16,3 +16,6 @@ local.properties
 *.keystore
 !emby_chapter.keystore
 证书.txt
+/emby_chapter/
+/*.html
+/*.md

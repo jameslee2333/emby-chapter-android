@@ -6,7 +6,7 @@ import retrofit2.http.*
 
 interface EmbyApiService {
 
-    @POST("Users/AuthenticateByName")
+    @POST("emby/Users/AuthenticateByName")
     suspend fun authenticate(
         @Header("X-Emby-Client") client: String = "Android Chapter Pro",
         @Header("X-Emby-Device-Name") deviceName: String = "Android",
@@ -15,7 +15,7 @@ interface EmbyApiService {
         @Body request: AuthRequest
     ): Response<AuthResponse>
 
-    @GET("Sessions")
+    @GET("emby/Sessions")
     suspend fun getSessions(
         @Header("X-Emby-Token") token: String
     ): Response<List<SessionsResponse>>
