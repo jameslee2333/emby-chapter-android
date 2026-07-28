@@ -1,21 +1,13 @@
-*.iml
+# Built artifacts
+/build
+/*/build
 .gradle
 /local.properties
-/.idea
+*.iml
+.idea
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
-/app/build
-/app/release
-*.apk
-*.aab
-*.jks
+captures
 *.keystore
-!emby_chapter.keystore
-证书.txt
-/emby_chapter/
-/*.html
-/*.md
+
+# WorkBuddy internal memory (not project source)
+.workbuddy/

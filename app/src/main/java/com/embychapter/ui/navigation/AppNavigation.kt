@@ -1,6 +1,5 @@
 package com.embychapter.ui.navigation
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Movie
@@ -8,26 +7,34 @@ import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.embychapter.ui.chapter.ChapterScreen
 import com.embychapter.ui.history.HistoryScreen
-import com.embychapter.ui.theme.SurfaceDark
 import com.embychapter.ui.videowall.VideoWallScreen
+import kotlin.reflect.KClass
+import kotlinx.serialization.Serializable
 
-sealed class Screen(val route: String, val label: String) {
-    data object Chapter : Screen("chapter", "章节管理")
-    data object History : Screen("history", "播放历史")
-    data object VideoWall : Screen("videowall", "视频墙")
-}
+// Type-safe navigation routes (serializable so NavHost can reconstruct them)
+@Serializable data object ChapterRoute
+@Serializable data object HistoryRoute
+@Serializable data object VideoWallRoute
 
-val bottomNavItems = listOf(
-    Screen.Chapter to Icons.Outlined.PlayCircle,
-    Screen.History to Icons.Outlined.History,
-    Screen.VideoWall to Icons.Outlined.Movie
+data class TopLevelDestination(
+    val route: Any,
+    val routeClass: KClass<out Any>,
+    val icon: ImageVector,
+    val label: String,
+    val title: String
+)
+
+val topLevelDestinations = listOf(
+    TopLevelDestination(ChapterRoute, ChapterRoute::class, Icons.Outlined.PlayCircle, "章节管理", "章节管理大师 Pro"),
+    TopLevelDestination(HistoryRoute, HistoryRoute::class, Icons.Outlined.History, "播放历史", "播放历史"),
+    TopLevelDestination(VideoWallRoute, VideoWallRoute::class, Icons.Outlined.Movie, "视频墙", "视频墙")
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,64 +42,52 @@ val bottomNavItems = listOf(
 fun AppNavigation() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val currentRouteClass = navBackStackEntry?.destination?.route?.let { it::class }
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            val title = when (currentRoute) {
-                Screen.Chapter.route -> "章节管理大师 Pro"
-                Screen.History.route -> "播放历史"
-                Screen.VideoWall.route -> "视频墙"
-                else -> "Emby 工具箱"
-            }
-            TopAppBar(
-                title = { Text(title) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-                    titleContentColor = MaterialTheme.colorScheme.onSurface
-                )
-            )
-        },
-        bottomBar = {
-            NavigationBar(
-                containerColor = SurfaceDark,
-                contentColor = MaterialTheme.colorScheme.onSurface
-            ) {
-                bottomNavItems.forEach { (screen, icon) ->
-                    NavigationBarItem(
-                        icon = { Icon(icon, contentDescription = screen.label) },
-                        label = { Text(screen.label) },
-                        selected = currentRoute == screen.route,
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = MaterialTheme.colorScheme.primary,
-                            selectedTextColor = MaterialTheme.colorScheme.primary,
-                            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        ),
-                        onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
+    // NavigationSuiteScaffold is adaptive: bottom bar on phones, rail on
+    // medium screens, drawer on expanded — the same scaffold pattern nowinandroid uses.
+    NavigationSuiteScaffold(
+        navigationSuiteItems = {
+            topLevelDestinations.forEach { destination ->
+                item(
+                    icon = { Icon(destination.icon, contentDescription = destination.label) },
+                    label = { Text(destination.label) },
+                    selected = currentRouteClass == destination.routeClass,
+                    onClick = {
+                        navController.navigate(destination.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
                             }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                    )
-                }
+                    }
+                )
             }
         }
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screen.Chapter.route,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            composable(Screen.Chapter.route) { ChapterScreen() }
-            composable(Screen.History.route) { HistoryScreen() }
-            composable(Screen.VideoWall.route) { VideoWallScreen() }
+    ) {
+        Scaffold(
+            topBar = {
+                val title = topLevelDestinations.firstOrNull { it.routeClass == currentRouteClass }?.title
+                    ?: "Emby 工具箱"
+                TopAppBar(
+                    title = { Text(title) },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                        titleContentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+            }
+        ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = ChapterRoute,
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                composable<ChapterRoute> { ChapterScreen() }
+                composable<HistoryRoute> { HistoryScreen() }
+                composable<VideoWallRoute> { VideoWallScreen() }
+            }
         }
     }
 }
