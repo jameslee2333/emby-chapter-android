@@ -36,11 +36,9 @@ fun EmbyWidgetContent(context: Context) {
     Column(
         modifier = GlanceModifier
             .fillMaxWidth()
-            .padding(12.dp)
+            .background(ColorProvider(android.graphics.Color.parseColor("#13222B")))
             .cornerRadius(16.dp)
-            .background(
-                ColorProvider(android.graphics.Color.parseColor("#13222B"))
-            )
+            .padding(12.dp)
     ) {
         // Header
         Row(
@@ -81,7 +79,7 @@ fun EmbyWidgetContent(context: Context) {
 }
 
 /**
- * 小程序 Receiver - 用于 Launcher 发现并渲染 Widget
+ * 小组件 Receiver - 用于 Launcher 发现并渲染 Widget
  */
 class EmbyWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = EmbyWidget()
