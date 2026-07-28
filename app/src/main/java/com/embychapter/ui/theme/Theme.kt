@@ -1,5 +1,6 @@
 package com.embychapter.ui.theme
 
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
@@ -32,6 +33,7 @@ private val ExpressiveDarkColorScheme = darkColorScheme(
     scrim = Color.Black.copy(alpha = 0.6f)
 )
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun EmbyChapterTheme(content: @Composable () -> Unit) {
     MaterialExpressiveTheme(

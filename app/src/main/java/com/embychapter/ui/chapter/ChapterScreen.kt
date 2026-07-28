@@ -114,6 +114,7 @@ fun ChapterScreen(viewModel: ChapterViewModel = viewModel()) {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun HeroSection(
     isLoggedIn: Boolean,

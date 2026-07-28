@@ -21,7 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.embychapter.data.model.PlayRecord
 import com.embychapter.ui.theme.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun HistoryScreen(viewModel: HistoryViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsState()

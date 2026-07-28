@@ -19,3 +19,6 @@ local.properties
 /emby_chapter/
 /*.html
 /*.md
+
+# AI 助手工作目录（本地记忆/缓存，不入库）
+.workbuddy/

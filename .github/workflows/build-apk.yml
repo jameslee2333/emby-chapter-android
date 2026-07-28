@@ -26,7 +26,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.9'
+          gradle-version: '8.11.1'
           validate-wrappers: false
 
       # PR 只检查能否编译通过
@@ -39,7 +39,16 @@ jobs:
         if: github.event_name != 'pull_request'
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-        run: echo "$KEYSTORE_BASE64" | base64 -d > emby_chapter.keystore
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::error::secrets.KEYSTORE_BASE64 未配置，无法签名 release 包。请在仓库 Settings > Secrets and variables > Actions 中配置 KEYSTORE_BASE64/KEYSTORE_PASSWORD/KEYSTORE_ALIAS/KEYSTORE_KEY_PASSWORD。"
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > emby_chapter.keystore
+          if [ ! -s emby_chapter.keystore ]; then
+            echo "::error::keystore 解码后为空文件，请检查 KEYSTORE_BASE64 内容是否正确。"
+            exit 1
+          fi
 
       - name: Build release
         if: github.event_name != 'pull_request'

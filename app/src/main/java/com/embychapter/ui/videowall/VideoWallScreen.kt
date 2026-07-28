@@ -28,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.embychapter.ui.theme.*
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun VideoWallScreen(viewModel: VideoWallViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsState()

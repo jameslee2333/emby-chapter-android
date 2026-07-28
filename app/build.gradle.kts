@@ -36,9 +36,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // keystore 存在就用它签名，不存在则 fallback 到 debug 签名（本地开发场景）
-            signingConfig = if (signingConfigs.getByName("release").storeFile?.exists() == true) {
-                signingConfigs.getByName("release")
+            // keystore 存在且非空才用 release 签名，否则 fallback 到 debug 签名
+            // （CI 未配置 secrets 时 base64 -d 会生成空文件，必须排除，否则签名阶段必挂）
+            val releaseSigning = signingConfigs.getByName("release")
+            val keystoreFile = releaseSigning.storeFile
+            signingConfig = if (keystoreFile != null && keystoreFile.exists() && keystoreFile.length() > 0L) {
+                releaseSigning
             } else {
                 signingConfigs.getByName("debug")
             }
