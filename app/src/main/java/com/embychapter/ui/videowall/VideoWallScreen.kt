@@ -103,7 +103,7 @@ fun VideoWallScreen(viewModel: VideoWallViewModel = viewModel()) {
 
         // Video grid
         if (state.isLoading && videos.isEmpty()) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { LoadingIndicator() }
         } else if (videos.isEmpty()) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(viewModel.emptyStateMessage, style = MaterialTheme.typography.bodyLarge, color = TextMuted)

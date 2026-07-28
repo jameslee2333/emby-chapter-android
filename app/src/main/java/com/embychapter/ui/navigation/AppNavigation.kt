@@ -37,7 +37,7 @@ val topLevelDestinations = listOf(
     TopLevelDestination(VideoWallRoute, VideoWallRoute::class, Icons.Outlined.Movie, "视频墙", "视频墙")
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
