@@ -29,7 +29,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.embychapter.ui.theme.*
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun VideoWallScreen(viewModel: VideoWallViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsState()
@@ -103,7 +102,7 @@ fun VideoWallScreen(viewModel: VideoWallViewModel = viewModel()) {
 
         // Video grid
         if (state.isLoading && videos.isEmpty()) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { LoadingIndicator() }
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
         } else if (videos.isEmpty()) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(viewModel.emptyStateMessage, style = MaterialTheme.typography.bodyLarge, color = TextMuted)

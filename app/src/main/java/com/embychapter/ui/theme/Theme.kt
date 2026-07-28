@@ -43,10 +43,8 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun EmbyChapterTheme(
     darkTheme: Boolean = true,
-    // Brand-driven app: dynamic color is off by default. To enable expressive
-    // dynamic color on Android 12+, flip this to true (requires the
-    // dynamicColorScheme(context, darkTheme, isExpressive = true) signature
-    // available in your installed material3 version).
+    // Brand-driven app: dynamic color is off by default. Flip to true on
+    // Android 12+ to follow the system wallpaper accent.
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -59,9 +57,7 @@ fun EmbyChapterTheme(
         else -> LightColorScheme
     }
 
-    // On material3 1.5.0-alpha (M3 Expressive) the default MaterialTheme
-    // motionScheme already uses expressive spring physics, so no extra setup
-    // is required for components to animate expressively.
+    // Stable Material 3: components animate with the standard motion scheme.
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,

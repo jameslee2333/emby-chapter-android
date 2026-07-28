@@ -11,8 +11,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.hasRoute
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.hasRoute
 import com.embychapter.ui.chapter.ChapterScreen
 import com.embychapter.ui.history.HistoryScreen
 import com.embychapter.ui.videowall.VideoWallScreen
@@ -38,57 +38,53 @@ val topLevelDestinations = listOf(
     TopLevelDestination(VideoWallRoute, VideoWallRoute::class, Icons.Outlined.Movie, "视频墙", "视频墙")
 )
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    // NavigationSuiteScaffold is adaptive: bottom bar on phones, rail on
-    // medium screens, drawer on expanded — the same scaffold pattern nowinandroid uses.
-    NavigationSuiteScaffold(
-        navigationSuiteItems = {
-            topLevelDestinations.forEach { destination ->
-                item(
-                    icon = { Icon(destination.icon, contentDescription = destination.label) },
-                    label = { Text(destination.label) },
-                    selected = currentDestination?.hasRoute(destination.routeClass) == true,
-                    onClick = {
-                        navController.navigate(destination.route) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
+    Scaffold(
+        topBar = {
+            val title = topLevelDestinations.firstOrNull { currentDestination?.hasRoute(it.routeClass) == true }?.title
+                ?: "Emby 工具箱"
+            TopAppBar(
+                title = { Text(title) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
                 )
+            )
+        },
+        bottomBar = {
+            NavigationBar {
+                topLevelDestinations.forEach { destination ->
+                    NavigationBarItem(
+                        icon = { Icon(destination.icon, contentDescription = destination.label) },
+                        label = { Text(destination.label) },
+                        selected = currentDestination?.hasRoute(destination.routeClass) == true,
+                        onClick = {
+                            navController.navigate(destination.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
+                }
             }
         }
-    ) {
-        Scaffold(
-            topBar = {
-                val title = topLevelDestinations.firstOrNull { currentDestination?.hasRoute(it.routeClass) == true }?.title
-                    ?: "Emby 工具箱"
-                TopAppBar(
-                    title = { Text(title) },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-                        titleContentColor = MaterialTheme.colorScheme.onSurface
-                    )
-                )
-            }
-        ) { innerPadding ->
-            NavHost(
-                navController = navController,
-                startDestination = ChapterRoute,
-                modifier = Modifier.padding(innerPadding)
-            ) {
-                composable<ChapterRoute> { ChapterScreen() }
-                composable<HistoryRoute> { HistoryScreen() }
-                composable<VideoWallRoute> { VideoWallScreen() }
-            }
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = ChapterRoute,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable<ChapterRoute> { ChapterScreen() }
+            composable<HistoryRoute> { HistoryScreen() }
+            composable<VideoWallRoute> { VideoWallScreen() }
         }
     }
 }
