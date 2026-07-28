@@ -14,7 +14,9 @@ coil = "2.7.0"
 datastore = "1.1.1"
 glance = "1.1.1"
 coroutines = "1.9.0"
-material3Expressive = "1.5.0-alpha23"
+# material3 锁定 1.4.0 stable（含 Expressive API）：1.5.0-alpha 系列要求
+# compileSdk 37 + AGP 9.1，与当前 AGP 8.10.1 / compileSdk 36 工具链不兼容
+material3Expressive = "1.4.0"
 
 [libraries]
 # AndroidX Core
