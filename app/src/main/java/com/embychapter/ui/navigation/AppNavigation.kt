@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.hasRoute
 import com.embychapter.ui.chapter.ChapterScreen
 import com.embychapter.ui.history.HistoryScreen
 import com.embychapter.ui.videowall.VideoWallScreen
@@ -42,7 +43,7 @@ val topLevelDestinations = listOf(
 fun AppNavigation() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRouteClass = navBackStackEntry?.destination?.route?.let { it::class }
+    val currentDestination = navBackStackEntry?.destination
 
     // NavigationSuiteScaffold is adaptive: bottom bar on phones, rail on
     // medium screens, drawer on expanded — the same scaffold pattern nowinandroid uses.
@@ -52,7 +53,7 @@ fun AppNavigation() {
                 item(
                     icon = { Icon(destination.icon, contentDescription = destination.label) },
                     label = { Text(destination.label) },
-                    selected = currentRouteClass == destination.routeClass,
+                    selected = currentDestination?.hasRoute(destination.routeClass) == true,
                     onClick = {
                         navController.navigate(destination.route) {
                             popUpTo(navController.graph.startDestinationId) {
@@ -68,7 +69,7 @@ fun AppNavigation() {
     ) {
         Scaffold(
             topBar = {
-                val title = topLevelDestinations.firstOrNull { it.routeClass == currentRouteClass }?.title
+                val title = topLevelDestinations.firstOrNull { currentDestination?.hasRoute(it.routeClass) == true }?.title
                     ?: "Emby 工具箱"
                 TopAppBar(
                     title = { Text(title) },
