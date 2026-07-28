@@ -14,9 +14,12 @@ coil = "2.7.0"
 datastore = "1.1.1"
 glance = "1.1.1"
 coroutines = "1.9.0"
-# material3 锁定 1.4.0 stable（含 Expressive API）：1.5.0-alpha 系列要求
-# compileSdk 37 + AGP 9.1，与当前 AGP 8.10.1 / compileSdk 36 工具链不兼容
-material3Expressive = "1.4.0"
+# material3 锁定 1.5.0-alpha18：Expressive API（ButtonGroup/FloatingToolbar 等）
+# 仅在 1.5.0-alpha 线提供（1.4.0 stable 不含）；alpha19/20 起要求
+# compileSdk 37 + AGP 9.1（已验证 AAR metadata），alpha18 是兼容当前
+# 工具链（compileSdk 36 / AGP 8.10.1）的最新版本，传递依赖 Compose
+# 1.11.0-beta02（minCompileSdk 35 / minAgp 8.6.0，已验证）
+material3Expressive = "1.5.0-alpha18"
 
 [libraries]
 # AndroidX Core
